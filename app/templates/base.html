@@ -1,0 +1,21 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }} - User Portal</title>
+      {% else %}
+      <title>Welcome to User Portal</title>
+      {% endif %}
+    </head>
+    <body>
+          <div>
+            User Portal: 
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('login_page') }}">Login</a>
+            <a href="{{ url_for('registration_page') }}">New user</a>
+            <a href="{{ url_for('users_page') }}">Userbase</a>
+          
+          </div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>
