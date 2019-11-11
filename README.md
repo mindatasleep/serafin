@@ -92,11 +92,3 @@ Include the Token in the header:
 docker-compose -f db/docker-compose.yml up -d
 docker-compose -f db/docker-compose.yml down -d
 ```
-
-Set credentials in `app/__init__.py`.
-KOslEd93b3wqaGak0HN3l2aNUJ&
-
-
-
-# References
-https://codeburst.io/jwt-authorization-in-flask-c63c1acf4eeb
