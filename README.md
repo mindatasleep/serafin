@@ -2,6 +2,9 @@
 
 An API to create and modify user accounts which create and modify applications. A user account has a role. Only ADMIN roles can modify the role of user accounts. Only accounts with a valid token can modify applications.
 
+### Specify MySQL database
+Set database URI in `app/__init__.py` as `dialect+driver://user:pass@host:port/db`.
+
 ### Tokens
 The app uses JWT for authentication. Access tokens are given to user accounts upon login (`create_access_token()`). The returned token must be added to request headers as `Authorization: Bearer <access_token>` in order to be granted access to protected resources.
 
@@ -16,6 +19,11 @@ pip install -r requirements.txt
 python3 -m app.app
 ```
 
+## Run app interactively in shell
+```
+flask shell
+```
+
 ## Swagger API documentation
 Interactive HTML
 ```
@@ -26,11 +34,6 @@ JSON
 http://127.0.0.1:5000/api/spec.json
 ```
 
-## Run app interactively in shell
-```
-flask shell
-```
-
 ## Inspect API
 Inspect API using `https://inspector.swagger.io/` or `https://www.getpostman.com/`.
 
@@ -39,7 +42,7 @@ In Swagger terms, `paths` are endpoints (resources) that the API exposes, such a
 ## Sample walkthrough
 ### Register user
 #### Request
-`POST http://0.0.0.0:5000/registration`
+`POST http://0.0.0.0:5000/users`
 #### Body
 ```
 {
@@ -76,12 +79,9 @@ Include the Token in the header:
 `POST http://127.0.0.1:5000/applicationregistration`
 #### Body
 {
-    "username": "admin",
-    "password": "pass",
-    "role": "ADMIN",
     "appname": "anapp",
     "url_app": "newrl",
-    "url_image": "newrBABYl",
+    "url_image": "newurl",
     "description": null,
     "url_ftp": null
 }
@@ -89,18 +89,8 @@ Include the Token in the header:
 
 ## Dockerized MySQL
 ```
-docker pull mysql/mysql-server:latest
-docker run --name=mysql1 -d mysql/mysql-server:latest
-
-# Check password
-docker logs mysql1 2>&1 | grep GENERATED
-
-# Start MySQL client
-docker exec -it mysql1 mysql -uroot -p
-```
-Enter password when prompted, then set your own with:
-```
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'newpassword';
+docker-compose -f db/docker-compose.yml up -d
+docker-compose -f db/docker-compose.yml down -d
 ```
 
 Set credentials in `app/__init__.py`.

@@ -1,4 +1,7 @@
 .idea
 .venv
 *.pyc
-
+app/templates/
+app/views.py
+app/sqlite.db
+db/

@@ -66,12 +66,12 @@ class UserModel(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(20), nullable=False)
-    token = db.Column(db.String(20), nullable=True)
-    lastcall = db.Column(db.DateTime, nullable=True, default = datetime.utcnow)
+    password = db.Column(db.String(30), nullable=False)
+    token = db.Column(db.String(2000), nullable=True)
+    lastcall = db.Column(db.DateTime, nullable=True)#, default = datetime.utcnow)
     role = db.Column(db.String(20), nullable=True)
-
-
+    # todo: add role dependency
+    # https://flask-sqlalchemy.palletsprojects.com/en/2.x/quickstart/
 
     @classmethod
     def update_lastcall_time(cls):
@@ -122,6 +122,45 @@ class UserModel(db.Model):
         except:
             return {'message': 'Error deleting users.'}
 
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+@swagger.model
+class RoleModel(db.Model):
+    """Table model for role
+    """
+
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key = True)
+    rolename = db.Column(db.String(20), unique=True, nullable=False)
+
+    @classmethod
+    def return_all(cls):
+        def to_json(x):
+            return {
+                'rolename': x.rolename,
+            }
+        return {'roles': list(map(lambda x: to_json(x), RoleModel.query.all()))}
+    
+    @classmethod
+    def find_by_rolename(cls, rolename):
+        return cls.query.filter_by(rolename = rolename).first()
+
+    @classmethod
+    def update_role(cls, data):
+        role_to_modify = RoleModel.query.filter_by(
+            rolename=data['rolename']).update(dict(
+                rolename = data['rolename']
+            ))
+        db.session.commit()
+
+    @classmethod
+    def delete_role(cls, rolename):
+        RoleModel.query.filter(RoleModel.rolename==rolename).delete
+        db.session.commit()
+        
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
