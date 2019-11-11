@@ -3,5 +3,6 @@
 *.pyc
 app/templates/
 app/views.py
+app/forms.py
 app/sqlite.db
 db/
