@@ -1,10 +1,12 @@
 from passlib.hash import pbkdf2_sha256 as sha256
 from datetime import datetime
+from flask_restful_swagger import swagger
+# from flask_restful_swagger_2 import swagger, Resource
 
 
-from . import db, swagger
+from . import db
 
-@swagger.model
+# @swagger.model
 class ApplicationModel(db.Model):
     """Table model for Application
     """
@@ -57,7 +59,7 @@ class ApplicationModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-@swagger.model
+# @swagger.model
 class UserModel(db.Model):
     """Table model for User.
     """
@@ -126,7 +128,7 @@ class UserModel(db.Model):
         db.session.add(self)
         db.session.commit()
 
-@swagger.model
+# @swagger.model
 class RoleModel(db.Model):
     """Table model for role
     """

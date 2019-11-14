@@ -1,22 +1,24 @@
+from functools import wraps
+
 from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
-from functools import wraps
-from flask_jwt_extended import get_current_user, verify_jwt_in_request
-from flask_restful import reqparse
-from flask_restful_swagger import swagger
-from flask_restful import Api
+from flask_restful import Api, reqparse
+from flasgger import Swagger, swag_from
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
 
 
-# Flask app attached to API object [enables swagger]
 app = Flask(__name__)
-# api = Api(app)
-api = swagger.docs(Api(app), apiVersion='0.1')
-# Token manager
+api = Api(app)
+swagger = Swagger(app)
+
+
+# Setup the Flask-JWT-Extended extension
+app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
 jwt = JWTManager(app)
 
-app.config['SECRET_KEY'] = 'YOUR_SECRET_KEY'
-app.config['JWT_SECRET_KEY'] = 'YOUR_JWT_SECRET_KEY'
 
 # Parse return arguments
 parser = reqparse.RequestParser()
@@ -30,9 +32,8 @@ parser.add_argument('url_image', required = False)
 parser.add_argument('description', required = False)
 parser.add_argument('url_ftp', required = False)
 
-# MySQL configuration
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:newpassword@localhost/updb2'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:newpassword@localhost:3308/updb'
+
+# Configure Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True

@@ -6,3 +6,4 @@ app/views.py
 app/forms.py
 app/sqlite.db
 db/
+app_prior/

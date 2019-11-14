@@ -16,7 +16,31 @@ class UserLogin(Resource):
 
     @swagger.operation()
     def post(self):
-        """Login"""
+        """
+        User Login
+        It works also with swag_from, schemas and spec_dict
+        ---
+        parameters:
+         - name: username
+           in: path
+           type: string
+           required: true
+         - name: password
+           in: path
+           type: string
+           required: true
+
+        responses:
+         200:
+           description: Successful login
+           schema:
+             id: User
+             properties:
+               username:
+                 type: string
+                 description: The name of the user
+                 default: Default Username
+        """
         data = parser.parse_args()
         current_user = UserModel.find_by_username(data['username'])
 
@@ -46,7 +70,47 @@ class AllUsers(Resource):
 
     @swagger.operation()
     def post(self):
-        """Create user"""
+        """
+        Create User
+        Description.
+        ---
+        consumes:
+         - application/json
+        parameters:
+         - name: username
+           in: body
+           schema:
+            type: object
+            required:
+             - usernawe
+             - password
+            properties:
+             username:
+              type: string
+             password:
+              type: string
+
+
+        responses:
+         200:
+           description: Create User successfully
+           schema:
+             id: User
+             properties:
+               username:
+                 type: string
+                 description: The name of the user
+                 default: Default Username
+         500:
+           description: Error creating user
+           schema:
+             id: User
+             properties:
+               message:
+                 type: string
+                 description: Error description
+                 default: Default
+        """
         data = parser.parse_args()
 
         if UserModel.find_by_username(data['username']):
@@ -54,8 +118,13 @@ class AllUsers(Resource):
 
         # Assert that password must contain a letter, a number, 
         # and have a length between 8 and 20 characters.
-        if re.match(r"^(?=.*[\d])(?i)(?=.*[A-Z])[\w\d@#$]{8,20}$",\
-        data['password']):
+
+        print(data)
+        print(data['username'])
+        print('!!!!!\n!!!!!@')
+        print(data['password'])
+        print(type(data['password']))
+        if re.match(r"^(?=.*[\d])(?i)(?=.*[A-Z])[\w\d@#$]{8,20}$", data['password']):
             pass
         else:
             return {'message': 'Error attempting to create password.',
@@ -68,9 +137,13 @@ class AllUsers(Resource):
         )
 
         try:
+            print('up to here3\n\n!!!!')
             access_token = create_access_token(identity = data['username'])
+            print('up to here2\n\n!!!!')
             refresh_token = create_refresh_token(identity = data['username'])
+            
             new_user.token = access_token
+            
             new_user.save_to_db()
             return {
                 'message': 'User {} created.'.format(data['username']),
@@ -82,7 +155,30 @@ class AllUsers(Resource):
 
     @swagger.operation()
     def get(self):
-        """View all users"""
+        """
+        View all users
+        Description.
+        ---
+        responses:
+         200:
+           description: Showing users (password encrypted)
+           schema:
+             id: User
+             properties:
+               username:
+                 type: string
+                 description: The names of the user
+                 default: Default Usernamen
+         500:
+           description: Error showing users
+           schema:
+             id: User
+             properties:
+               message:
+                 type: string
+                 description: Error description
+                 default: Default
+        """
         return UserModel.return_all()
 
     @swagger.operation()

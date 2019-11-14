@@ -27,6 +27,7 @@ flask shell
 ## Swagger API documentation
 Interactive HTML
 ```
+http://localhost:5000/apidocs/
 http://127.0.0.1:5000/api/spec.html
 ```
 JSON
