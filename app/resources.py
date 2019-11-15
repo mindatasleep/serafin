@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token,\
     jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt,\
     get_current_user, get_jwt_claims
 from flask_restful_swagger import swagger
+from flasgger import swag_from
 
 from .models import UserModel,  ApplicationModel, RoleModel
 from . import parser, db, jwt
@@ -107,7 +108,7 @@ class AllUsers(Resource):
 
     def post(self):
         """
-        Create User
+        Create User  [START HERE]
         Description.
         ---
         consumes:
@@ -189,6 +190,7 @@ class AllUsers(Resource):
         except:
             return {'message': 'Error attempting to create username {}.'.format(data['username'])}, 500
 
+
     def get(self):
         """
         View all users
@@ -269,21 +271,14 @@ class AllUsers(Resource):
                             default: Default
 
         """
-
-        # User to edit
-        data = parser.parse_args()
-
-        # Access the identity of the current user with get_jwt_claims()
-        claims = get_jwt_claims()
-        print('####claims \nin fn', claims)
-        print('claims: ', claims)
-      
         # Is admin()
         if is_admin():
             pass
         else:
             return {'message': 'Admin priviledge required.'}, 403
 
+        # User to edit
+        data = parser.parse_args()
 
         # If the User with username exists
         if UserModel.find_by_username(data['username']):
@@ -299,9 +294,28 @@ class AllUsers(Resource):
     @jwt_required
     def delete(self):
         """
-        file: swagger.yml
+        Delete all users
+        Token must be active AND belong to a user of role ADMIN
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: Authorization
+              in: header
+              schema:
+                type: object
+                required:
+                    - access_token
+                properties:
+                    access_token:
+                        type: string
+        responses:
+            200:
+                description: Delete all users
+            500:
+                description: Error deleting users
         """
-                # Is admin()
+        # Is admin()
         if is_admin():
             pass
         else:
@@ -311,13 +325,35 @@ class AllUsers(Resource):
         return UserModel.delete_all()
       
 
-class ApplicationRegistration(Resource):
+class AllApplications(Resource):
     """Application Registration
     """
 
     @jwt_required
     def get(self):
-        """View all applications"""
+        """
+        View all applications
+        Description.
+        ---
+        responses:
+            200:
+                description: Showing applications
+                schema:
+                    id: User
+                    properties:
+                    username:
+                    type: string
+                    description: The names of the applications
+            500:
+                description: Error showing applications
+                schema:
+                    id: User
+                    properties:
+                        message:
+                            type: string
+                            description: Error description
+                            default: Default
+        """
         try:
             current_user = get_jwt_identity()
 
@@ -328,7 +364,61 @@ class ApplicationRegistration(Resource):
     
     @jwt_required
     def post(self):
-        """Create application"""
+        """
+        Create Application
+        Description.
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: body
+              in: body
+              schema:
+                type: object
+                required:
+                    - appname
+                properties:
+                    appname:
+                        type: string
+                    appname:
+                        type: string
+                    url_app:
+                        type: string
+                    url_image:
+                        type: string
+                    description:
+                        type: string
+                    url_ftp:
+                        type: string
+                    
+        responses:
+            200:
+                description: Create Application successfully
+                schema:
+                    id: Application
+                    properties:
+                        message:
+                            type: string
+                            description: The name of the application
+                            default: Default Appname
+                        access_token:
+                            type: string
+                            description: JWT access token
+                            default: access_token
+                        refresh_token:
+                            type: string
+                            description: JWT refresh token
+                            default: refresh_token
+            500:
+                description: Error creating Application
+                schema:
+                    id: Application
+                    properties:
+                    message:
+                        type: string
+                        description: Error description
+                        default: Default
+        """
         # Is admin()
         if is_admin():
             pass
@@ -356,7 +446,63 @@ class ApplicationRegistration(Resource):
 
     @jwt_required    
     def put(self):
-        """Edit application"""
+        """
+        Edit application
+        Token must be active AND belong to a user of role ADMIN
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: body
+              in: body
+              schema:
+                type: object
+                required:
+                    - appname
+                properties:
+                    appname:
+                        type: string
+                    appname:
+                        type: string
+                    url_app:
+                        type: string
+                    url_image:
+                        type: string
+                    description:
+                        type: string
+                    url_ftp:
+                        type: string
+ 
+            - name: Authorization
+              in: header
+              schema:
+                type: object
+                required:
+                    - access_token
+                properties:
+                    access_token:
+                        type: string
+        responses:
+            200:
+                description: Edit application
+                schema:
+                    id: User
+                    properties:
+                    username:
+                    type: string
+                    description: The name of the application
+                    default: Default appname
+            500:
+                description: Error editing application
+                schema:
+                    id: User
+                    properties:
+                        message:
+                            type: string
+                            description: Error description
+                            default: Default
+
+        """
         # Is admin()
         if is_admin():
             pass
@@ -374,11 +520,30 @@ class ApplicationRegistration(Resource):
         else:
             return {'message': 'Cannot find application {}'.format(data['appname'])}
         
-
-
     @jwt_required
     def delete(self):
-        """Delete application"""
+        """
+        Delete all applications
+        Token must be active AND belong to a user of role ADMIN
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: Authorization
+              in: header
+              schema:
+                type: object
+                required:
+                    - access_token
+                properties:
+                    access_token:
+                        type: string
+        responses:
+            200:
+                description: Delete all applications
+            500:
+                description: Error deleting applications
+        """
         data = parser.parse_args()
 
         if ApplicationModel.find_by_appname(data['appname']):
@@ -395,7 +560,30 @@ class AllRoles(Resource):
     """All Roles"""
 
     def get(self):
-        """View all roles"""
+        """
+        View all roles
+        Description.
+        ---
+        responses:
+            200:
+                description: Showing users (password encrypted)
+                schema:
+                    id: User
+                    properties:
+                    username:
+                    type: string
+                    description: The names of the user
+                    default: Default Username
+            500:
+                description: Error showing users
+                schema:
+                    id: User
+                    properties:
+                        message:
+                            type: string
+                            description: Error description
+                            default: Default
+        """
         try:
             current_user = get_jwt_identity()
 
@@ -406,7 +594,50 @@ class AllRoles(Resource):
     
     @jwt_required
     def post(self):
-        """Create role"""
+        """
+        Create Role
+        Description.
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: body
+              in: body
+              schema:
+                type: object
+                required:
+                    - rolename
+                properties:
+                    rolename:
+                        type: string                    
+        responses:
+            200:
+                description: Create Role successfully
+                schema:
+                    id: Role
+                    properties:
+                        message:
+                            type: string
+                            description: The name of the role
+                            default: Default Rolename
+                        access_token:
+                            type: string
+                            description: JWT access token
+                            default: access_token
+                        refresh_token:
+                            type: string
+                            description: JWT refresh token
+                            default: refresh_token
+            500:
+                description: Error creating Role
+                schema:
+                    id: Role
+                    properties:
+                    message:
+                        type: string
+                        description: Error description
+                        default: Default
+        """
         # Is admin()
         if is_admin():
             pass
@@ -429,10 +660,55 @@ class AllRoles(Resource):
         except:
             return {'message': 'Error attempting to create role {}.'.format(data['rolename'])}, 500
 
+
     @jwt_required
     def put(self):
-        """Edit role"""
+        """
+        Edit rolename
+        Token must be active AND belong to a user of role ADMIN
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: body
+              in: body
+              schema:
+                type: object
+                required:
+                    - rolename
+                properties:
+                    rolename:
+                        type: string
+            - name: Authorization
+              in: header
+              schema:
+                type: object
+                required:
+                    - access_token
+                properties:
+                    access_token:
+                        type: string
+        responses:
+            200:
+                description: Edit rolename
+                schema:
+                    id: User
+                    properties:
+                        rolename:
+                            type: string
+                            description: The names of the user
+                            default: Default Username
+            500:
+                description: Error editing user
+                schema:
+                    id: User
+                    properties:
+                        message:
+                            type: string
+                            description: Error description
+                            default: Default
 
+        """
         # Is admin()
         if is_admin():
             pass
@@ -452,10 +728,30 @@ class AllRoles(Resource):
             return {'message': 'Cannot find role {}'.format(data['rolename'])}
         
 
-
     @jwt_required
     def delete(self):
-        """Delete role"""
+        """
+        Delete all roles
+        Token must be active AND belong to a user of role ADMIN
+        ---
+        consumes:
+            - application/json
+        parameters:
+            - name: Authorization
+              in: header
+              schema:
+                type: object
+                required:
+                    - access_token
+                properties:
+                    access_token:
+                        type: string
+        responses:
+            200:
+                description: Delete all roles
+            500:
+                description: Error deleting roles
+        """
         # Is admin()
         if is_admin():
             pass
@@ -472,3 +768,5 @@ class AllRoles(Resource):
                 return {'message': 'Error attempting to delete role {}.'.format(data['rolename'])}
         else:
             return {'message': 'Cannot find role {}.'.format(data['rolename'])}
+
+

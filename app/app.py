@@ -13,6 +13,8 @@ from . import app, api, Swagger, db, jwt
 
 api.add_resource(resources.UserLogin, '/login')
 api.add_resource(resources.AllUsers, '/user')
+api.add_resource(resources.AllRoles, '/role')
+api.add_resource(resources.AllApplications, '/app')
 
 
 # Instantiate tables in database
