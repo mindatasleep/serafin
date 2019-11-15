@@ -1,5 +1,3 @@
-from functools import wraps
-
 from flask import Flask, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api, reqparse
@@ -20,6 +18,7 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
 jwt = JWTManager(app)
 
 
+
 # Parse return arguments
 parser = reqparse.RequestParser()
 parser.add_argument('username', required = False)
@@ -38,19 +37,3 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sqlite.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-
-# Decorator to require 'ADMIN' role status
-def admin_required(fn):
-    # Wrapper to assert user has ADMIN role.
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        # verify_jwt_in_request()
-        # user = get_current_user()
-        data = parser.parse_args()
-        print(data)
-
-        if data['role'] == 'ADMIN':
-            return fn(*args, *kwargs)
-        return {'message': 'Admin priviledge required.'}, 403
-
-    return wrapper

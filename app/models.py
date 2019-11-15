@@ -6,6 +6,12 @@ from flask_restful_swagger import swagger
 
 from . import db
 
+
+class RefreshesJWT():
+
+    def refreshJWT(self):
+        self.token = 'placeholder'
+        self.lastcall = datetime.utcnow
 # @swagger.model
 class ApplicationModel(db.Model):
     """Table model for Application
@@ -78,7 +84,7 @@ class UserModel(db.Model):
     @classmethod
     def update_lastcall_time(cls):
         try:
-            _update_lastcall_time = db.session.query(cls).update().values(lastcall = datetime.utcnow)
+            db.session.query(cls).update().values(lastcall = datetime.utcnow)
             db.session.commit()
             return {'message': 'Updated lastcall time.'}
         except:
@@ -96,6 +102,23 @@ class UserModel(db.Model):
     @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username = username).first()
+
+    @classmethod
+    def isadmin(cls, username):
+        if cls.query.filter_by(username = username).first().role == 'ADMIN':
+            return True
+        else:
+            return False
+
+    @classmethod
+    def update_user(cls, data):
+        user_to_modify = UserModel.query.filter_by(
+            username=data['username']).update(dict(
+                username = data['username'],
+                password = data['password'],
+                role = data['role']
+            ))
+        db.session.commit()
 
     @staticmethod
     def generate_hash(password):
