@@ -18,7 +18,6 @@ app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
 jwt = JWTManager(app)
 
 
-
 # Parse return arguments
 parser = reqparse.RequestParser()
 parser.add_argument('username', required = False)
